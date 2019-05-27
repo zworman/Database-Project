@@ -1,0 +1,14 @@
+\i ins_customer.sql
+\i ins_supplier.sql
+\i ins_nutrition.sql
+\i ins_store.sql
+\i ins_employee.sql
+\i ins_clock_in.sql
+\i ins_produce.sql
+\i ins_menu.sql
+\i ins_order.sql
+\i ins_prodquan.sql
+\i ins_orderquan.sql
+\i ins_supquan.sql
+\i ins_prodnut.sql
+\i ins_menuprod.sql

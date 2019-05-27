@@ -1,0 +1,16 @@
+INSERT INTO nutrition VALUES(0,'serving size');
+INSERT INTO nutrition VALUES(1,'calories');
+INSERT INTO nutrition VALUES(2,'total fat');
+INSERT INTO nutrition VALUES(3,'sturated fat');
+INSERT INTO nutrition VALUES(4,'trans fat');
+INSERT INTO nutrition VALUES(5,'cholesterol');
+INSERT INTO nutrition VALUES(6,'sodium');
+INSERT INTO nutrition VALUES(7,'total carbohydrates');
+INSERT INTO nutrition VALUES(8,'dietary fiber');
+INSERT INTO nutrition VALUES(9,'sugars');
+INSERT INTO nutrition VALUES(10,'protein');
+INSERT INTO nutrition VALUES(11,'vitamins');
+INSERT INTO nutrition VALUES(12,'calcium');
+INSERT INTO nutrition VALUES(13,'iron');
+INSERT INTO nutrition VALUES(14,'potassium');
+commit;

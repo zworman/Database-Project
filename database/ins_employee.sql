@@ -1,0 +1,26 @@
+INSERT INTO employee VALUES(0,'Vince','R','Shalko','1110 S NORMANDIE AVE 90006',to_date('9/4/1991', 'mm/dd/yyyy'),'532-06-4458',1,to_date('6/17/2006', 'mm/dd/yyyy'),to_date('10/14/2018', 'mm/dd/yyyy'),'supervisor',13.75);
+INSERT INTO employee VALUES(1,'Karrah','V','Goldman','649 N JACON WAY 90272',to_date('2/3/1940', 'mm/dd/yyyy'),'985-93-5421',0,to_date('1/6/2003', 'mm/dd/yyyy'),NULL,'support',17.63);
+INSERT INTO employee VALUES(2,'Jorge','Q','Naughton','2631 S HILLCREST DR 90016',to_date('5/18/1994', 'mm/dd/yyyy'),'896-51-2419',0,to_date('4/19/2007', 'mm/dd/yyyy'),NULL,'cashier',18.09);
+INSERT INTO employee VALUES(3,'Natalee','R','Shields','625 N ST LOUIS ST 90033',to_date('1/6/1911', 'mm/dd/yyyy'),'046-98-0175',1,to_date('5/18/2010', 'mm/dd/yyyy'),NULL,'salad prep',18.94);
+INSERT INTO employee VALUES(4,'Theressa','Q','Sioda','10032 N COLLETT AVE 91343',to_date('4/1/1981', 'mm/dd/yyyy'),'009-80-1402',2,to_date('12/2/2006', 'mm/dd/yyyy'),to_date('12/20/2019', 'mm/dd/yyyy'),'janitor',12.37);
+INSERT INTO employee VALUES(5,'Bill','W','Dang','951 E 118TH PL 90059',to_date('5/8/1973', 'mm/dd/yyyy'),'164-65-1934',2,to_date('8/17/2003', 'mm/dd/yyyy'),NULL,'salad prep',12.69);
+INSERT INTO employee VALUES(6,'Glynn','D','Komura','6460 N GREENBUSH AVE 91401',to_date('1/1/1918', 'mm/dd/yyyy'),'418-54-1009',1,to_date('4/9/2000', 'mm/dd/yyyy'),NULL,'support',18.88);
+INSERT INTO employee VALUES(7,'Woodrow','M','Randle','3051 E WHITTIER BLVD 90023',to_date('3/7/1903', 'mm/dd/yyyy'),'385-06-6188',1,to_date('1/17/2001', 'mm/dd/yyyy'),to_date('10/19/2018', 'mm/dd/yyyy'),'cold prep',14.15);
+INSERT INTO employee VALUES(8,'Morty','F','Tweddle','7239 N REMMET AVE 91303',to_date('5/9/1906', 'mm/dd/yyyy'),'683-00-5106',2,to_date('4/7/2014', 'mm/dd/yyyy'),NULL,'griller',19.47);
+INSERT INTO employee VALUES(9,'Emelda','F','Peerenboom','1013 W 25TH ST 90731',to_date('2/18/1914', 'mm/dd/yyyy'),'365-97-9924',1,to_date('1/12/2015', 'mm/dd/yyyy'),to_date('9/18/2018', 'mm/dd/yyyy'),'support',15.14);
+INSERT INTO employee VALUES(10,'Noland','J','Bagroff','4642 S LINCOLN BLVD 90292',to_date('2/2/1940', 'mm/dd/yyyy'),'315-06-4505',2,to_date('6/11/2012', 'mm/dd/yyyy'),NULL,'support',17.75);
+INSERT INTO employee VALUES(11,'Gen','E','BÃ©ringer','15425 W DICKENS ST 91403',to_date('8/5/1919', 'mm/dd/yyyy'),'007-82-5401',1,to_date('1/5/2003', 'mm/dd/yyyy'),NULL,'supervisor',15.81);
+INSERT INTO employee VALUES(12,'Mireielle','T','Fabr','5912 1/2 W HOLLYWOOD BLVD 90028',to_date('7/16/1954', 'mm/dd/yyyy'),'045-67-7229',1,to_date('3/5/2010', 'mm/dd/yyyy'),to_date('11/10/2019', 'mm/dd/yyyy'),'supervisor',17.52);
+INSERT INTO employee VALUES(13,'Wakefield','E','Oneil','1364 N LAKME AVE 90744',to_date('4/20/1938', 'mm/dd/yyyy'),'361-38-4772',1,to_date('1/9/2006', 'mm/dd/yyyy'),NULL,'cashier',16.96);
+INSERT INTO employee VALUES(14,'Jeraldine','J','Hahn','1568 W PICO BLVD 90015',to_date('2/4/1929', 'mm/dd/yyyy'),'967-33-6351',1,to_date('2/15/2000', 'mm/dd/yyyy'),to_date('12/16/2017', 'mm/dd/yyyy'),'manager',16.83);
+INSERT INTO employee VALUES(15,'Alecia','Q','Clarkson','1311 W 70TH ST 90044',to_date('7/20/1913', 'mm/dd/yyyy'),'741-96-7663',0,to_date('7/7/2011', 'mm/dd/yyyy'),to_date('4/1/2018', 'mm/dd/yyyy'),'support',15.85);
+INSERT INTO employee VALUES(16,'Archy','L','Pavlik','1004 1/2 E 76TH ST 90001',to_date('11/2/1908', 'mm/dd/yyyy'),'867-53-3472',1,to_date('5/15/2005', 'mm/dd/yyyy'),to_date('6/11/2019', 'mm/dd/yyyy'),'manager',13.39);
+INSERT INTO employee VALUES(17,'Caritta','V','Bakshtein','6618 S VAN NESS AVE 90047',to_date('1/8/1962', 'mm/dd/yyyy'),'575-77-8346',2,to_date('12/4/2006', 'mm/dd/yyyy'),to_date('12/7/2017', 'mm/dd/yyyy'),'cashier',16.11);
+INSERT INTO employee VALUES(18,'Rickie','Y','Egin','10739 N BAILE AVE 91311',to_date('9/11/1970', 'mm/dd/yyyy'),'098-74-8227',2,to_date('8/2/2014', 'mm/dd/yyyy'),to_date('3/2/2019', 'mm/dd/yyyy'),'supervisor',14.63);
+INSERT INTO employee VALUES(19,'Brian','C','Danks','6814 N ALABAMA AVE 91303',to_date('11/15/1939', 'mm/dd/yyyy'),'146-19-4922',0,to_date('3/17/2008', 'mm/dd/yyyy'),NULL,'cashier',14.05);
+INSERT INTO employee VALUES(20,'Benjamin','Q','Fakhoury','542 S KINGSLEY DR 90020',to_date('6/13/1934', 'mm/dd/yyyy'),'787-77-6883',1,to_date('6/9/2011', 'mm/dd/yyyy'),to_date('11/3/2016', 'mm/dd/yyyy'),'support',13.58);
+INSERT INTO employee VALUES(21,'Faustine','A','Geeson','9502 S BELFORD AVE 90045',to_date('3/15/1992', 'mm/dd/yyyy'),'572-71-1912',2,to_date('12/2/2004', 'mm/dd/yyyy'),NULL,'cold prep',12.68);
+INSERT INTO employee VALUES(22,'Shelton','X','Allcott','1340 N SIERRA ALTA WAY 90069',to_date('4/13/1959', 'mm/dd/yyyy'),'289-35-5049',1,to_date('10/1/2003', 'mm/dd/yyyy'),NULL,'salad prep',18.99);
+INSERT INTO employee VALUES(23,'Merrick','C','Janosik','13017 W MONTANA AVE 90049',to_date('2/1/1940', 'mm/dd/yyyy'),'866-86-6387',2,to_date('5/20/2005', 'mm/dd/yyyy'),to_date('12/11/2017', 'mm/dd/yyyy'),'supervisor',14.85);
+INSERT INTO employee VALUES(24,'Nedda','D','Makhlinsky','6717 N SATSUMA AVE 1-23 91606',to_date('1/17/1980', 'mm/dd/yyyy'),'654-09-0783',2,to_date('3/2/2003', 'mm/dd/yyyy'),NULL,'support',19.35);
+INSERT INTO employee VALUES(25,

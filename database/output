@@ -1,0 +1,1282 @@
+--
+-- PostgreSQL database cluster dump
+--
+
+SET default_transaction_read_only = off;
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+
+--
+-- Roles
+--
+
+CREATE ROLE postgres;
+ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS;
+CREATE ROLE zak;
+ALTER ROLE zak WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN NOREPLICATION NOBYPASSRLS;
+
+
+
+
+
+
+--
+-- Database creation
+--
+
+REVOKE CONNECT,TEMPORARY ON DATABASE template1 FROM PUBLIC;
+GRANT CONNECT ON DATABASE template1 TO PUBLIC;
+CREATE DATABASE zak WITH TEMPLATE = template0 OWNER = zak;
+
+
+\connect postgres
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: DATABASE postgres; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\connect template1
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: DATABASE template1; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE template1 IS 'default template for new databases';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\connect zak
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: bot_average(integer); Type: FUNCTION; Schema: public; Owner: zak
+--
+
+CREATE FUNCTION public.bot_average(n integer) RETURNS real
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+avg real;
+total real;
+BEGIN
+SELECT AVG(price) INTO avg FROM (SELECT price FROM menu_items ORDER BY price ASC LIMIT n) AS p;
+RETURN avg;
+END;
+$$;
+
+
+ALTER FUNCTION public.bot_average(n integer) OWNER TO zak;
+
+--
+-- Name: top_average(integer); Type: FUNCTION; Schema: public; Owner: zak
+--
+
+CREATE FUNCTION public.top_average(n integer) RETURNS real
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+avg real;
+total real;
+BEGIN
+SELECT AVG(price) INTO avg FROM (SELECT price FROM menu_items ORDER BY price DESC LIMIT n) AS p;
+RETURN avg;
+END;
+$$;
+
+
+ALTER FUNCTION public.top_average(n integer) OWNER TO zak;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: c_order; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.c_order (
+    employee_id integer NOT NULL,
+    customer_num integer NOT NULL,
+    menu_id integer NOT NULL,
+    order_id integer NOT NULL,
+    order_date date NOT NULL
+);
+
+
+ALTER TABLE public.c_order OWNER TO zak;
+
+--
+-- Name: clock_in; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.clock_in (
+    employee_id integer NOT NULL,
+    time_in timestamp without time zone NOT NULL,
+    time_out timestamp without time zone NOT NULL,
+    earnings real NOT NULL,
+    store_number integer DEFAULT 1,
+    CONSTRAINT ck_times CHECK ((time_in < time_out)),
+    CONSTRAINT clock_in_earnings_check CHECK ((earnings > (0)::double precision))
+);
+
+
+ALTER TABLE public.clock_in OWNER TO zak;
+
+--
+-- Name: customer; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.customer (
+    customer_num integer NOT NULL,
+    phone_number character varying(50),
+    name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.customer OWNER TO zak;
+
+--
+-- Name: employee; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.employee (
+    employee_id integer NOT NULL,
+    fname character varying(20) NOT NULL,
+    minit character varying(1),
+    lname character varying(20) NOT NULL,
+    address character varying(50) NOT NULL,
+    dob date NOT NULL,
+    ssn character varying(11) NOT NULL,
+    store_number integer DEFAULT 1,
+    start_date date NOT NULL,
+    end_date date,
+    "position" character varying(20),
+    salary real DEFAULT 12.00,
+    CONSTRAINT ck_employee_dates CHECK (((start_date < end_date) OR (end_date IS NULL))),
+    CONSTRAINT employee_position_check CHECK ((("position")::text = ANY ((ARRAY['janitor'::character varying, 'salad prep'::character varying, 'griller'::character varying, 'cold prep'::character varying, 'support'::character varying, 'cashier'::character varying, 'supervisor'::character varying, 'manager'::character varying])::text[]))),
+    CONSTRAINT employee_salary_check CHECK ((salary >= (12.00)::double precision))
+);
+
+
+ALTER TABLE public.employee OWNER TO zak;
+
+--
+-- Name: menu_items; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.menu_items (
+    menu_id integer NOT NULL,
+    name character varying(100) NOT NULL,
+    price real NOT NULL,
+    produce_id integer NOT NULL,
+    CONSTRAINT menu_items_price_check CHECK ((price > (0.00)::double precision))
+);
+
+
+ALTER TABLE public.menu_items OWNER TO zak;
+
+--
+-- Name: nutrition; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.nutrition (
+    nutrition_id integer NOT NULL,
+    n_type character varying(50)
+);
+
+
+ALTER TABLE public.nutrition OWNER TO zak;
+
+--
+-- Name: order_quantity; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.order_quantity (
+    order_id integer NOT NULL,
+    menu_id integer NOT NULL,
+    price real,
+    CONSTRAINT order_quantity_price_check CHECK ((price >= (0.00)::double precision))
+);
+
+
+ALTER TABLE public.order_quantity OWNER TO zak;
+
+--
+-- Name: produce; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.produce (
+    prod_type character varying(20) NOT NULL,
+    quantity integer,
+    acquired date,
+    expiration date,
+    weight real,
+    produce_id integer NOT NULL,
+    CONSTRAINT produce_check CHECK (((expiration > acquired) OR (acquired IS NULL))),
+    CONSTRAINT produce_quantity_check CHECK ((quantity >= 0)),
+    CONSTRAINT produce_weight_check CHECK ((weight >= (0.00)::double precision))
+);
+
+
+ALTER TABLE public.produce OWNER TO zak;
+
+--
+-- Name: produce_nutrition; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.produce_nutrition (
+    produce_id integer NOT NULL,
+    nutrition_id integer NOT NULL,
+    value integer
+);
+
+
+ALTER TABLE public.produce_nutrition OWNER TO zak;
+
+--
+-- Name: produce_quantity; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.produce_quantity (
+    produce_id integer NOT NULL,
+    menu_id integer NOT NULL,
+    weight_in_item real
+);
+
+
+ALTER TABLE public.produce_quantity OWNER TO zak;
+
+--
+-- Name: store; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.store (
+    store_num integer NOT NULL,
+    location character varying(100)
+);
+
+
+ALTER TABLE public.store OWNER TO zak;
+
+--
+-- Name: supplier; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.supplier (
+    supplier_id integer NOT NULL,
+    name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.supplier OWNER TO zak;
+
+--
+-- Name: supply_order; Type: TABLE; Schema: public; Owner: zak
+--
+
+CREATE TABLE public.supply_order (
+    supplier_id integer NOT NULL,
+    price real,
+    produce_id integer NOT NULL,
+    order_date date NOT NULL,
+    store_num integer NOT NULL,
+    weight real,
+    CONSTRAINT supply_order_price_check CHECK ((price > (0.00)::double precision)),
+    CONSTRAINT supply_order_weight_check CHECK ((weight > (0.00)::double precision))
+);
+
+
+ALTER TABLE public.supply_order OWNER TO zak;
+
+--
+-- Data for Name: c_order; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.c_order (employee_id, customer_num, menu_id, order_id, order_date) FROM stdin;
+14	6	107	0	2014-11-11
+17	1	74	1	2001-12-17
+10	21	4	2	2013-06-20
+38	23	4	3	2017-09-17
+43	5	73	4	2000-09-15
+4	1	10	5	2011-06-07
+29	12	85	6	2010-05-19
+22	16	94	7	2017-04-06
+27	49	100	8	2010-02-15
+41	3	94	9	2007-06-12
+29	19	93	10	2018-01-12
+24	48	65	11	2005-01-20
+7	18	70	12	2016-10-03
+8	41	2	13	2003-11-13
+15	22	56	14	2014-03-03
+24	44	34	15	2016-10-08
+30	4	95	16	2010-05-20
+1	28	107	17	2007-07-04
+26	10	38	18	2019-08-08
+16	31	108	19	2003-12-17
+17	10	47	20	2019-02-08
+33	47	97	21	2011-06-07
+48	5	55	22	2019-10-04
+16	39	37	23	2009-06-13
+44	7	3	24	2007-11-06
+16	48	97	25	2009-03-14
+21	33	68	26	2006-09-09
+8	15	48	27	2005-03-19
+21	21	53	28	2001-05-14
+38	2	43	29	2000-03-10
+46	10	27	30	2015-09-08
+42	16	32	31	2018-08-15
+13	7	28	32	2002-02-11
+47	38	100	33	2015-08-16
+13	13	104	34	2014-06-16
+15	41	88	35	2015-08-18
+17	14	11	36	2010-12-08
+18	36	82	37	2013-07-19
+12	17	89	38	2013-01-10
+12	19	15	39	2006-05-20
+34	35	53	40	2000-03-09
+21	22	57	41	2004-11-18
+23	12	105	42	2011-09-03
+38	35	5	43	2017-05-11
+11	42	103	44	2017-05-01
+32	18	53	45	2005-01-12
+30	40	2	46	2009-11-15
+19	33	56	47	2006-10-05
+39	2	91	48	2010-01-13
+8	24	59	49	2007-08-14
+\.
+
+
+--
+-- Data for Name: clock_in; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.clock_in (employee_id, time_in, time_out, earnings, store_number) FROM stdin;
+41	2002-04-19 11:45:57	2002-04-19 21:24:51	17.6900005	2
+9	2015-11-11 22:30:25	2015-11-11 23:41:41	53.7700005	2
+3	2015-07-25 05:15:43	2015-07-25 06:58:50	9.60000038	0
+31	2014-04-09 20:17:12	2014-04-09 23:56:04	4.94999981	2
+37	2005-11-18 11:36:23	2005-11-18 19:50:36	72.5100021	2
+32	2018-12-05 12:13:45	2018-12-05 19:18:56	4.28999996	2
+39	2017-03-24 17:22:46	2017-03-24 23:16:25	28.1399994	1
+45	2018-07-04 09:54:54	2018-07-04 14:11:41	95.8000031	1
+15	2019-08-02 17:04:25	2019-08-02 22:34:36	32.2900009	0
+16	2007-02-24 11:55:42	2007-02-24 22:50:29	12.6400003	0
+6	2003-03-05 21:48:07	2003-03-05 23:29:22	79.4400024	0
+29	2016-10-09 05:15:37	2016-10-09 14:51:31	54.0600014	2
+42	2016-11-04 06:08:02	2016-11-04 11:48:39	8.10000038	1
+49	2004-03-10 10:16:31	2004-03-10 19:22:44	10.3199997	1
+8	2006-05-12 12:54:00	2006-05-12 20:50:40	60.7999992	2
+25	2011-03-17 12:24:15	2011-03-17 17:48:49	29.9500008	2
+35	2005-01-09 10:42:53	2005-01-09 21:52:44	48.4300003	0
+48	2019-08-10 09:09:36	2019-08-10 22:14:42	32.3499985	1
+35	2008-02-05 01:57:46	2008-02-05 13:10:25	60.6199989	1
+41	2018-08-20 06:54:41	2018-08-20 16:59:42	45.1800003	0
+20	2009-03-09 08:40:06	2009-03-09 11:44:07	8.39000034	2
+39	2017-03-15 19:34:50	2017-03-15 20:11:01	47.4799995	1
+26	2013-06-21 00:14:40	2013-06-21 05:07:50	98.4599991	1
+24	2003-03-21 05:48:11	2003-03-21 07:24:03	70.9000015	1
+16	2003-03-04 21:16:07	2003-03-04 22:15:35	16.4200001	1
+36	2011-03-23 13:36:53	2011-03-23 23:29:26	21.4899998	2
+9	2003-01-09 19:53:22	2003-01-09 20:11:32	1.89999998	2
+17	2017-03-21 22:16:43	2017-03-21 23:57:22	15.5299997	2
+5	2012-02-15 22:50:35	2012-02-15 23:11:55	17.8400002	2
+2	2016-11-15 19:39:32	2016-11-15 22:38:41	77.1699982	2
+3	2014-10-10 02:20:50	2014-10-10 11:22:41	49.8400002	0
+39	2000-06-17 11:36:16	2000-06-17 23:32:45	81.3199997	2
+34	2004-06-14 08:58:07	2004-06-14 19:55:36	63.0200005	2
+39	2012-01-07 20:04:18	2012-01-07 21:49:29	41.5600014	2
+3	2010-06-01 11:48:41	2010-06-01 22:49:23	87.3099976	2
+9	2011-06-25 17:21:24	2011-06-25 23:53:55	90.75	2
+22	2016-06-17 15:55:00	2016-06-17 17:00:38	43.8199997	0
+13	2016-03-23 00:09:03	2016-03-23 21:30:24	33.7299995	1
+46	2017-01-15 13:56:25	2017-01-15 19:22:32	72.1299973	0
+47	2017-06-22 05:00:56	2017-06-22 23:57:25	55.6500015	1
+14	2001-01-12 16:13:56	2001-01-12 21:26:52	32.2700005	2
+1	2005-12-21 13:22:18	2005-12-21 14:39:06	15.3800001	1
+3	2006-01-24 09:05:58	2006-01-24 16:17:35	9.44999981	2
+35	2016-04-18 05:37:16	2016-04-18 17:42:52	58.4300003	0
+35	2019-08-18 04:16:36	2019-08-18 05:18:11	2.66000009	0
+48	2008-10-21 04:31:18	2008-10-21 08:19:33	7	2
+30	2014-02-18 00:08:20	2014-02-18 09:53:54	58.9700012	1
+23	2012-09-06 21:50:18	2012-09-06 23:12:21	45.2400017	2
+42	2004-09-13 03:09:16	2004-09-13 13:15:37	71.6299973	0
+45	2012-08-21 00:31:45	2012-08-21 06:47:21	84.4599991	1
+\.
+
+
+--
+-- Data for Name: customer; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.customer (customer_num, phone_number, name) FROM stdin;
+0	(873)934-0950	Theressa Drury
+1	(329)275-2915	Noelle Jefferies
+2	(740)521-4646	Petronille Than
+3	(912)394-2744	Bryan Marino
+4	(213)180-2332	Pamella Tahan
+5	(141)043-6347	Mariette Zogby
+6	(655)550-9576	Jeana Axon
+7	(253)809-5095	Kissee Zogby
+8	(931)596-7464	Griselda Richards
+9	(614)839-8582	Iris Fakhoury
+10	(698)854-9661	Miran Mansour
+11	(260)647-6031	Elizabeth Nasikovsky
+12	(413)031-3493	Eugenie Golovatsky
+13	(237)733-6103	Jerrie Rothery
+14	(006)951-8846	Gail Munaev
+15	(525)424-4081	Shannon Masih
+16	(294)730-0495	Kincaid Zheravin
+17	(554)140-3969	Forster Jaffray
+18	(465)553-4329	Amalee Novosiltsev
+19	(854)308-0224	Gerrard Liu
+20	(986)799-9459	Petronille Moghadam
+21	(963)040-2936	Darth Etherton
+22	(647)028-9482	Rhianon Mcghee
+23	(116)707-8348	Stanwood Lancaster
+24	(514)681-5054	Mario Jefferies
+25	(985)733-4912	Chase Ashida
+26	(553)220-6689	Rosamond Divaev
+27	(964)137-7493	Petronia Ventura
+28	(308)505-0736	Randi Vass
+29	(222)005-4390	Filip Wagstaff
+30	(110)551-1365	Carlos Nakazawa
+31	(408)090-5765	Jennee Ganim
+32	(203)310-9122	Natala Gibson
+33	(280)515-3517	Ester Toichkin
+34	(583)220-6505	Quinton Ryjkin
+35	(735)614-5092	Hewett Demichev
+36	(960)251-2913	Enrika Salzwedel
+37	(862)515-4136	Amber Buonarroti
+38	(262)258-0080	Bryna Bagmut
+39	(283)786-1856	Val Iwasa
+40	(964)979-5220	Deedee Hawtin
+41	(140)654-2475	Hortense Lachapelle
+42	(955)840-5698	Marje Blanco
+43	(380)028-8621	Julio Ivanov
+44	(973)798-5419	Andriette Astley
+45	(346)817-6157	Jock Arrigucci
+46	(524)536-0625	Sawyer Aylett
+47	(800)024-2813	Kimmi Kobi
+48	(321)733-8484	Paulina Dantsig
+49	(021)082-5159	Gunvor Svoboda
+\.
+
+
+--
+-- Data for Name: employee; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.employee (employee_id, fname, minit, lname, address, dob, ssn, store_number, start_date, end_date, "position", salary) FROM stdin;
+0	Bert	F	Virgo	6556 N COSTELLO AVE 91401	1902-05-14	796-18-8886	2	2000-05-04	2016-09-18	salad prep	14.8599997
+1	Malvina	M	Datsenko	20551 W HART ST 91306	1919-10-08	701-08-6457	1	2004-04-12	2016-04-03	salad prep	13.2700005
+2	Karine	R	Bumgarner	3655 S ST ANDREWS PL 90018	1958-06-14	931-17-4534	2	2014-02-20	2019-10-18	cold prep	12.54
+3	Thom	I	Baiseitov	13535 W MOORPARK ST 91423	1922-04-15	654-96-0193	2	2011-04-12	\N	support	12.3500004
+4	Andonis	E	Pickering	422 N LAKE ST 90026	1954-05-01	886-13-2931	0	2006-12-04	\N	cashier	16.1599998
+5	Dwayne	W	Mitsuya	7546 S WESTLAWN AVE 90045	1998-01-15	270-58-2652	0	2013-01-09	\N	supervisor	15.2399998
+6	Nelly	Y	Tyman	3054 E FAIRMOUNT ST 90063	1914-02-12	129-70-4835	1	2001-02-08	\N	manager	18.75
+7	Morlee	U	Ibarra	4725 N LANKERSHIM BLVD 91602	1957-04-02	191-29-9637	0	2001-04-08	\N	janitor	13.6400003
+8	Amata	H	Whitfield	10548 N HILLHAVEN AVE 91042	1978-01-04	735-22-1635	0	2002-01-07	\N	griller	18.1800003
+9	Trixy	M	Zhiganov	13619 W GAIN ST 91331	1976-06-15	476-48-7077	0	2010-12-12	2017-06-10	support	18.8899994
+10	Bren	H	Balabas	20246 W JUBILEE WAY 91326	1962-11-03	322-17-4039	2	2013-03-06	2016-06-13	griller	19.8600006
+11	Jotham	Q	Holl	8611 W WENTWORTH ST 91040	1966-12-20	764-11-9331	0	2004-02-13	2019-03-03	salad prep	13.6899996
+12	Carlena	F	Fabrikant	2211 S MAIN ST 90007	1944-06-18	730-57-6251	2	2000-12-06	\N	supervisor	12.8999996
+13	Dawn	E	Grey	1680 S LONGWOOD AVE 90019	1994-02-10	918-87-3922	1	2015-09-10	\N	supervisor	19.7199993
+14	Randolf	P	Tubelsky	2146 N STONEWOOD CT 90732	1947-07-06	613-53-0048	2	2010-05-11	\N	cashier	15.7399998
+15	Iormina	O	Muirchertach	1830 S MENLO AVE 90006	1907-10-15	873-93-2111	0	2003-06-04	\N	cashier	16.8799992
+16	Farand	Y	Psik	10947 W PEACH GROVE ST 91601	1965-07-02	246-59-7902	2	2010-10-15	2017-07-13	cold prep	19.6200008
+17	Olaf	L	Schitsyn	11919 W SALTAIR TER 90049	1936-02-07	490-70-1051	2	2007-03-03	2016-04-02	cold prep	14.5799999
+18	Nani	O	Kalimullin	14684 W RAYEN ST 1-30 91402	1922-12-03	106-51-7902	1	2007-03-11	\N	salad prep	15.0299997
+19	Lane	T	Hajjar	753 N NORTH SPRING ST 90012	1913-07-11	804-25-7412	2	2005-02-13	2018-07-08	salad prep	13.5200005
+20	Tiana	Z	Abelman	8369 N WILBUR AVE 91324	1908-09-09	807-21-9422	2	2002-07-09	\N	manager	19.8199997
+21	Marion	L	Imoo	13345 W GARBER ST 91331	1950-06-05	272-89-5912	0	2013-04-17	\N	cashier	12.6499996
+22	Russell	B	Pears	4816 S 5TH AVE 90043	1969-05-05	147-14-3729	0	2003-08-14	2017-06-11	salad prep	14.7799997
+23	Yanaton	Z	Cormac	716 W 3RD ST 90731	1988-06-03	706-85-4548	1	2010-09-02	\N	supervisor	19.7199993
+24	Kary	V	Gosden	17173 W MCKEEVER ST 91344	1903-03-02	363-40-5277	1	2000-10-02	\N	cold prep	12.6499996
+25	Stevana	A	Wen	11400 N WILBUR AVE 91326	1928-04-13	846-19-4199	1	2013-09-12	2018-09-10	salad prep	13.4399996
+26	Vinnie	V	Mansour	405 W BAMBOO LANE 90012	1971-05-03	483-62-3669	2	2001-10-01	\N	janitor	12.6300001
+27	Estrella	G	Dagher	10707 W SATICOY ST 91352	1975-02-18	740-71-6761	0	2007-04-06	\N	manager	18.4699993
+28	Lindy	W	Fistal	4031 S LA SALLE AVE 90062	1915-04-17	529-86-7064	1	2008-08-14	2016-02-04	griller	19.4799995
+29	Margery	M	Deeb	11362 W HOMEDALE ST 90049	2001-03-02	045-94-1380	1	2009-01-17	\N	griller	16.9799995
+30	Rubin	C	Antar	257 1/2 W 80TH ST 90003	1968-06-03	432-89-0516	0	2004-11-07	\N	supervisor	18.1900005
+31	Gilbert	W	Samuel	666 W SLAUSON AVE 90044	1969-04-06	946-90-7133	2	2014-10-06	2016-03-11	cashier	17.1499996
+32	Kellen	P	Giannakos	5840 N ETIWANDA AVE 1-4 91356	1919-12-07	432-18-6372	2	2010-02-02	\N	supervisor	12.8000002
+33	Rianon	G	Félix	4800 W OAKWOOD AVE 90004	1916-05-01	942-54-3290	2	2008-01-15	\N	supervisor	12.6499996
+34	Kylie	O	Solberg	2931 S SEPULVEDA BLVD 90064	1958-07-01	399-34-8368	1	2006-04-06	2018-01-10	manager	18.0699997
+35	Mike	G	Kerridge	23155 W OXNARD ST 91367	1945-03-05	996-40-4033	0	2009-10-07	\N	cold prep	19.5
+36	Cass	Z	Tomas	10776 W TABOR ST 90034	1946-05-08	168-99-2593	0	2009-04-08	2019-12-01	griller	14.6199999
+37	Murdock	O	Ilsley	3980 E GLENALBYN DR 90065	1961-05-14	431-92-8321	2	2013-06-14	2019-05-07	cashier	14.54
+38	Noni	X	Garner	854 E 118TH ST 90059	1924-08-04	148-86-8337	0	2000-02-02	2018-03-07	cold prep	12.21
+39	Samuel	A	Wrench	727 N CRESCENT HEIGHTS BLVD 90046	1989-02-20	817-96-6464	0	2003-01-19	2016-01-06	salad prep	19.3099995
+40	Bobbette	H	Vu	1247 W 18TH ST 90731	1960-12-20	907-87-9851	2	2012-02-07	2019-03-04	manager	15.6300001
+41	Camilla	P	Gaber	127 E AVENUE 45 90031	1904-06-08	528-53-0376	2	2003-02-02	\N	salad prep	13.96
+42	Melisa	T	Neave	22275 W MACFARLANE DR 91364	1981-08-19	510-54-7713	2	2015-10-17	\N	janitor	13.3900003
+43	Valencia	Y	Gridnev	3038 S 5TH AVE 90018	1915-04-08	043-13-4548	0	2005-07-13	2016-10-07	cashier	15.7200003
+44	Kania	F	Tyman	111 1/2 S FLORES ST 90048	1954-09-09	283-60-6397	1	2009-12-06	\N	griller	19.3400002
+45	Virgie	D	Tubinov	2161 E 101ST ST 90002	1928-11-08	995-90-9290	0	2009-01-01	\N	cold prep	16.9300003
+46	Yehudit	P	Soho	2230 W 14TH ST 90006	1968-04-11	732-59-0972	1	2002-02-18	\N	supervisor	15.4799995
+47	Jami	U	Turubanov	2644 N CAHUENGA BLVD EAST 90068	1923-01-16	038-27-1406	1	2001-03-20	\N	griller	18.2600002
+48	Joyan	S	Oppenheimer	11603 W HAYNES ST 91606	1927-08-13	082-90-7408	1	2011-05-20	2018-12-08	support	15.1800003
+49	Guillema	A	Horowitz	3517 S CHESAPEAKE AVE 90016	1967-05-20	558-32-4021	1	2009-02-10	2016-02-14	cold prep	15.8299999
+\.
+
+
+--
+-- Data for Name: menu_items; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.menu_items (menu_id, name, price, produce_id) FROM stdin;
+0	BBQ Chicken	17.2900009	25
+1	California Chicken Breast Sandwich	11.6599998	39
+2	California Pastrami	8.30000019	12
+3	Chicken Caesar	7.23000002	25
+4	Chicken Fajita	3.6500001	26
+5	Chicken Italiano	17.6499996	8
+6	Classic Reuben	6.69999981	21
+7	French Dip	22.4400005	2
+8	Grilled Cajun Turkey	3.88000011	27
+9	Hot Ham & Cheese	28.7099991	12
+10	Hot Roast Beef	12.3999996	16
+11	Monterey Chicken Club	26.3899994	7
+12	Philly Cheesesteak	23.3799992	30
+13	Southwestern Chicken	29.1700001	3
+14	Tuna Melt	8.17000008	40
+15	Turkey Bacon Melt	7.67000008	31
+16	Turkey Dip	17.9300003	1
+17	Tomato-Basil Mozzarella Panini	8.51000023	30
+18	Eggplant-Artichoke Panini	4.38000011	37
+19	Turkey Pesto Panini	16.3099995	27
+20	Albacore Tuna	3.26999998	11
+21	BLT	3.77999997	5
+22	Cajun Turkey	17.7999992	42
+23	Chicken & Bacon Club	2.21000004	39
+24	Club Deluxe	9.30000019	21
+25	Cracked Pepper Turkey	10.0699997	33
+26	Egg Salad	10.04	16
+27	Ham & Baby Swiss	6.13000011	42
+28	Heart Smart - Ham	3.31999993	27
+29	Heart Smart - Turkey	22.5400009	4
+30	Roast Beef	6.30999994	36
+31	Roast Turkey Breast	24.2999992	10
+32	Sequoia Sandwich	6.11999989	28
+33	The Sicilian	3.71000004	2
+34	Waldorf Chicken Sandwich	7.40999985	34
+35	Lite Lunch	11.2399998	36
+36	Double Hot Ham & Cheese	7.94000006	33
+37	The All American	4.26000023	23
+38	The Big Dipper	5.6500001	29
+39	The Italian Stallion	9.15999985	1
+40	The New Yorker	16.2999992	40
+41	Turkey Club	11.6999998	38
+42	Cold Veggie & Cheese	23.8700008	2
+43	Deluxe Grilled Cheese	13.5799999	15
+44	Eggplant-Artichoke Panini	12.8699999	30
+45	Hot Vegetarian	10.0600004	23
+46	Tomato-Basil Mozzarella Panini	25.2900009	39
+47	Antipasta Salad	20.1700001	15
+48	Bistro Salad	18.2800007	19
+49	Caesar Salad	21.5499992	3
+50	California Chicken Salad	3.1500001	15
+51	Chicken Caesar Salad	11.71	31
+52	Cobb Salad	3.1099999	25
+53	Garden Salad	26.3999996	31
+54	Greek Salad	15.8400002	22
+55	Mini Bistro	5.82000017	35
+56	Mini Caesar Salad	11.2799997	41
+57	Mini Garden Salad	9.42000008	6
+58	Sesame Chicken Salad	29.5599995	6
+59	Southwestern Chicken Salad	7.01999998	22
+60	Spinach Kale	29.2999992	42
+61	Slaw Salad	18.8299999	36
+62	Spring Salad	12.1800003	35
+63	Taco Salad	27.2900009	23
+64	Tuna Salad	21.0400009	3
+65	Waldorf Chicken Salad	25.2099991	17
+66	Banana Pudding	29.3199997	34
+67	Butter Cake	24.3199997	32
+68	Carrot Cake	8.56000042	41
+69	Frosted Fudge Brownies	6.28999996	11
+70	Garys Famous Chocolate Cake	13.4799995	16
+71	German Chocolate Cake	13.0600004	12
+72	Homemade Cookies	2.58999991	39
+73	Homemade New York Cheesecake	22.6100006	7
+74	Lemon Berry Cake	15.04	41
+75	New York Cheesecake w/strawberry sauce	23.1200008	39
+76	Rice Krispy Treat	27.9500008	23
+77	Grilled Cheese	5.75	32
+78	Turkey	7.32000017	27
+79	Ham	23.5100002	18
+80	Salami	7.46000004	7
+81	Bottled Soda	20.4899998	21
+82	Bottled Water	27.3299999	35
+83	Hot Tea	28.6599998	7
+84	Regular Fountain Drink	19.0699997	31
+85	Sparkling Water	3.49000001	3
+86	Sobe	16.7299995	16
+87	Fuse	5.61000013	36
+88	Specialty Sodas	19.6700001	13
+89	Juices	17.7800007	10
+90	Milk	10.8599997	1
+91	Energy Drinks	9.89000034	40
+92	Coffee	15.4799995	9
+93	Chocolate Milk	10.9300003	41
+94	Baked Potatoes	19	16
+95	Bowl of Tuna	28.5400009	22
+96	Bowl of Waldorf Chicken Salad	7.32999992	15
+97	Broccoli & Raisin	19.5499992	20
+98	Broccoli-Pasta	6.07999992	37
+99	Chili	15.8699999	9
+100	Chili & Cornbread Special	25.0599995	30
+101	Creamy Cole Slaw	9.11999989	11
+102	Hot Sourdough Rolls	8.46000004	37
+103	Macaroni	2.83999991	9
+104	Potato Chips	19.8099995	0
+105	Quinoa	27.2299995	11
+106	Soup - Broth	21.2299995	8
+107	Soup - Cream	5.69000006	34
+108	Yukon Potato	14.2299995	26
+\.
+
+
+--
+-- Data for Name: nutrition; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.nutrition (nutrition_id, n_type) FROM stdin;
+0	serving size
+1	calories
+2	total fat
+3	sturated fat
+4	trans fat
+5	cholesterol
+6	sodium
+7	total carbohydrates
+8	dietary fiber
+9	sugars
+10	protein
+11	vitamins
+12	calcium
+13	iron
+14	potassium
+\.
+
+
+--
+-- Data for Name: order_quantity; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.order_quantity (order_id, menu_id, price) FROM stdin;
+41	20	126.43
+15	67	45.0200005
+49	7	125.790001
+40	89	153.699997
+10	50	47.7599983
+38	77	82.6600037
+11	101	162.929993
+8	101	127.75
+41	105	186.850006
+31	83	73.4499969
+33	7	195.740005
+17	20	24.1399994
+23	47	55.1899986
+29	16	188.160004
+30	76	139.240005
+49	12	172.479996
+6	66	6.23000002
+34	92	15.8000002
+41	55	34.5299988
+1	36	209.669998
+16	12	68.75
+39	60	152.410004
+43	51	188.330002
+10	66	78.5199966
+26	68	129.179993
+21	10	3.27999997
+21	74	170.25
+35	65	36.9300003
+47	50	13.8100004
+39	57	102.349998
+11	50	80.5500031
+40	16	94.7799988
+20	8	17.6299992
+24	67	168.929993
+6	47	70.2699966
+45	94	31.8799992
+9	89	45.1800003
+14	37	25.4599991
+33	108	134.830002
+38	25	86.6699982
+26	12	74.1299973
+8	32	77.6200027
+12	7	28.5200005
+40	56	121.400002
+47	98	34.6800003
+27	32	15.3299999
+1	98	56.75
+28	61	125.980003
+42	8	71.3300018
+28	37	14.8599997
+\.
+
+
+--
+-- Data for Name: produce; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.produce (prod_type, quantity, acquired, expiration, weight, produce_id) FROM stdin;
+Ham	14	2019-01-05	2019-10-08	23.2700005	0
+Turkey	38	2019-04-12	2019-07-12	16.3299999	1
+Chicken	25	2019-06-01	2019-10-20	28.9799995	2
+Beef	37	2019-02-19	2019-07-16	16.8899994	3
+Salami	10	2019-04-19	2019-09-11	26.1399994	4
+Pastrami	5	2019-03-04	2019-07-10	22.7099991	5
+Tuna	0	2019-05-03	2019-09-12	18.7800007	6
+Monterey	30	2019-05-12	2019-07-12	18.8199997	7
+Pepper Jack	42	2019-04-19	2019-07-11	7.19000006	8
+Cheddar	19	2019-05-07	2019-12-09	16.1299992	9
+American	27	2019-03-18	2019-10-09	18.5499992	10
+Provolone	41	2019-06-12	2019-07-18	6.53999996	11
+Parmesan	26	2019-04-04	2019-12-13	4.28999996	12
+Mozzarella	8	2019-06-07	2019-09-14	3.68000007	13
+Swiss	40	2019-01-02	2019-10-14	24.8700008	14
+Feta	17	2019-04-20	2019-08-03	20.2399998	15
+Blue Cheese	39	2019-06-11	2019-07-08	17.8400002	16
+Lettuce	43	2019-06-11	2019-12-07	24.4200001	17
+Tomatoes	41	2019-06-06	2019-07-09	20.9400005	18
+Spinach	7	2019-03-17	2019-07-17	20.9099998	19
+Sprouts	46	2019-02-11	2019-10-20	7	20
+Pepperoccines	0	2019-05-12	2019-10-19	18.3999996	21
+Bell Peppers	0	2019-05-08	2019-07-05	13.4200001	22
+Jalapenos	23	2019-02-01	2019-12-12	18.9400005	23
+Mushrooms	9	2019-01-18	2019-07-09	8.97999954	24
+Egg Plant	46	2019-03-08	2019-12-12	25.8199997	25
+Artichoke	5	2019-01-10	2019-12-18	28.7800007	26
+Avocado	14	2019-04-03	2019-08-07	20.3700008	27
+French	33	2019-04-13	2019-08-08	16.0200005	28
+Onion Dill Roll	14	2019-03-03	2019-10-16	3.13000011	29
+Squaw	9	2019-05-12	2019-08-15	1.78999996	30
+White	45	2019-04-02	2019-11-10	23.4099998	31
+Wheat	20	2019-05-13	2019-11-02	27.0100002	32
+Sourdough	45	2019-03-14	2019-10-13	5.30000019	33
+Rye	4	2019-02-06	2019-12-09	8.31999969	34
+Gluten Free	7	2019-04-06	2019-08-02	10.1400003	35
+Croissant	10	2019-03-20	2019-11-16	18.3500004	36
+Oil	43	2019-02-07	2019-11-07	20.0400009	37
+Vinegar	29	2019-03-18	2019-10-09	7.07000017	38
+Mayonnaise	47	2019-02-12	2019-10-20	14.8400002	39
+Mustard	24	2019-01-09	2019-07-14	6.11000013	40
+Pesto	44	2019-03-10	2019-10-01	18.2099991	41
+Honey	44	2019-06-04	2019-07-11	10.0100002	42
+\.
+
+
+--
+-- Data for Name: produce_nutrition; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.produce_nutrition (produce_id, nutrition_id, value) FROM stdin;
+26	9	452
+31	2	282
+12	9	365
+37	11	192
+2	1	185
+28	11	344
+27	14	103
+1	12	165
+6	4	117
+15	1	442
+22	9	129
+31	12	182
+1	13	263
+3	13	60
+2	5	187
+25	4	495
+16	12	420
+11	12	17
+19	9	59
+31	3	238
+9	14	157
+1	2	302
+11	14	134
+33	6	310
+5	11	170
+25	13	35
+14	4	483
+3	14	479
+42	1	344
+3	2	417
+32	6	261
+17	10	58
+9	10	122
+5	0	468
+26	8	116
+21	10	335
+21	7	208
+28	7	245
+1	9	341
+10	8	442
+7	7	458
+17	2	113
+32	14	149
+1	3	130
+13	7	111
+29	0	128
+5	4	195
+9	2	84
+30	13	342
+0	4	500
+\.
+
+
+--
+-- Data for Name: produce_quantity; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.produce_quantity (produce_id, menu_id, weight_in_item) FROM stdin;
+0	28	2.41000009
+5	77	1.17999995
+3	33	1.95000005
+15	58	2.55999994
+13	82	3.83999991
+36	73	4.96999979
+1	44	2.76999998
+31	15	3.41000009
+26	2	1.12
+8	56	1.91999996
+38	78	1.72000003
+3	87	3.3900001
+7	104	1.21000004
+11	49	1.52999997
+42	43	1.85000002
+7	53	1.41999996
+33	61	2.97000003
+17	3	4.30000019
+28	40	3.8499999
+24	52	3.51999998
+27	13	2.54999995
+14	7	3.03999996
+5	67	4.92999983
+36	55	2.55999994
+8	38	1.50999999
+38	16	4.13999987
+10	17	4.44999981
+23	68	3.8599999
+3	93	4.07999992
+12	7	1.58000004
+22	82	4.61000013
+21	38	3.73000002
+7	16	3.03999996
+23	21	2.61999989
+37	4	4.71999979
+36	52	1.84000003
+22	20	2.46000004
+19	65	4.05000019
+0	83	2.54999995
+38	23	2.3499999
+36	77	2.70000005
+39	49	3.13000011
+39	43	1.75
+42	56	1.73000002
+35	23	1.27999997
+4	61	1.44000006
+0	73	4.38000011
+18	42	4.13999987
+9	3	3.82999992
+41	11	1.54999995
+\.
+
+
+--
+-- Data for Name: store; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.store (store_num, location) FROM stdin;
+0	1231 18th St. Bakersfield, CA, 93301
+1	9500 Ming Ave. Bakersfield, CA, 93311
+2	9160 Rosedale Hwy. Suite #100 Bakersfield, CA, 93312
+\.
+
+
+--
+-- Data for Name: supplier; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.supplier (supplier_id, name) FROM stdin;
+1	AWESOME QUALITY SUPPLIER CO.
+\.
+
+
+--
+-- Data for Name: supply_order; Type: TABLE DATA; Schema: public; Owner: zak
+--
+
+COPY public.supply_order (supplier_id, price, produce_id, order_date, store_num, weight) FROM stdin;
+1	623.719971	6	2005-12-06	0	432.730011
+1	606.460022	29	2005-06-04	2	123.190002
+1	453.670013	27	2000-05-06	2	487.609985
+1	703.559998	24	2001-09-09	1	228.630005
+1	131.589996	3	2002-09-04	0	205.050003
+1	862.909973	39	2014-11-17	2	171.729996
+1	951.469971	24	2013-09-16	2	229.740005
+1	776.460022	12	2019-01-10	1	134.059998
+1	724.52002	7	2019-08-13	0	190.529999
+1	911.950012	26	2004-11-02	0	147.160004
+1	157.75	12	2001-12-08	0	105.699997
+1	167.139999	39	2007-02-01	0	383.140015
+1	140.429993	16	2005-11-06	1	212.440002
+1	547.419983	5	2015-05-10	0	109.209999
+1	929.460022	31	2012-08-19	1	364.929993
+1	226.089996	37	2013-11-17	0	257.140015
+1	536.48999	25	2010-12-03	0	403.179993
+1	816.940002	37	2007-07-14	1	340.540009
+1	742.210022	5	2017-03-09	0	236.910004
+1	357.5	38	2002-03-10	0	326.640015
+1	596.650024	25	2005-09-02	1	216.169998
+1	428.589996	16	2001-08-14	1	376.769989
+1	835.710022	33	2011-06-04	2	400.470001
+1	461.339996	18	2017-04-14	2	364.119995
+1	295.25	2	2012-11-12	2	461.75
+1	435.619995	12	2001-03-01	2	423.190002
+1	782.72998	39	2014-01-06	1	418.119995
+1	914.890015	33	2019-07-04	0	169.410004
+1	305.480011	41	2011-04-05	1	462.730011
+1	297.329987	18	2014-01-08	2	447.980011
+1	389.410004	38	2006-07-06	0	100.57
+1	568.429993	33	2003-04-04	0	351.619995
+1	111.580002	14	2003-11-02	1	467.859985
+1	523.349976	0	2004-12-20	2	218.779999
+1	853.380005	36	2007-07-04	1	238.740005
+1	834.539978	24	2008-11-19	1	178.059998
+1	914.23999	11	2010-08-16	2	492.529999
+1	100.260002	25	2007-07-03	2	476.720001
+1	804.950012	24	2003-06-13	2	156.259995
+1	895.059998	39	2013-10-14	2	166.080002
+1	775.039978	22	2016-11-18	1	185.25
+1	865.52002	18	2013-03-02	2	115.650002
+1	763.27002	2	2016-11-14	0	235.619995
+1	531.47998	5	2015-02-02	2	327.940002
+1	728.099976	23	2000-12-17	0	436.619995
+1	706.01001	31	2009-10-14	1	337.619995
+1	248.919998	5	2018-06-20	2	109.099998
+1	451.829987	14	2012-12-11	0	400.429993
+1	510.820007	23	2006-02-17	2	254.779999
+1	481.959991	26	2001-11-01	0	341.630005
+\.
+
+
+--
+-- Name: c_order c_order_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.c_order
+    ADD CONSTRAINT c_order_pkey PRIMARY KEY (order_id);
+
+
+--
+-- Name: customer customer_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.customer
+    ADD CONSTRAINT customer_pkey PRIMARY KEY (customer_num);
+
+
+--
+-- Name: employee employee_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.employee
+    ADD CONSTRAINT employee_pkey PRIMARY KEY (employee_id);
+
+
+--
+-- Name: menu_items menu_items_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.menu_items
+    ADD CONSTRAINT menu_items_pkey PRIMARY KEY (menu_id);
+
+
+--
+-- Name: nutrition nutrition_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.nutrition
+    ADD CONSTRAINT nutrition_pkey PRIMARY KEY (nutrition_id);
+
+
+--
+-- Name: produce produce_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.produce
+    ADD CONSTRAINT produce_pkey PRIMARY KEY (produce_id);
+
+
+--
+-- Name: store store_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.store
+    ADD CONSTRAINT store_pkey PRIMARY KEY (store_num);
+
+
+--
+-- Name: supplier supplier_pkey; Type: CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.supplier
+    ADD CONSTRAINT supplier_pkey PRIMARY KEY (supplier_id);
+
+
+--
+-- Name: c_order c_order_customer_num_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.c_order
+    ADD CONSTRAINT c_order_customer_num_fkey FOREIGN KEY (customer_num) REFERENCES public.customer(customer_num);
+
+
+--
+-- Name: c_order c_order_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.c_order
+    ADD CONSTRAINT c_order_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employee(employee_id);
+
+
+--
+-- Name: c_order c_order_menu_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.c_order
+    ADD CONSTRAINT c_order_menu_id_fkey FOREIGN KEY (menu_id) REFERENCES public.menu_items(menu_id);
+
+
+--
+-- Name: clock_in clock_in_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.clock_in
+    ADD CONSTRAINT clock_in_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES public.employee(employee_id);
+
+
+--
+-- Name: clock_in clock_in_store_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.clock_in
+    ADD CONSTRAINT clock_in_store_number_fkey FOREIGN KEY (store_number) REFERENCES public.store(store_num);
+
+
+--
+-- Name: employee employee_store_number_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.employee
+    ADD CONSTRAINT employee_store_number_fkey FOREIGN KEY (store_number) REFERENCES public.store(store_num);
+
+
+--
+-- Name: menu_items menu_items_produce_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.menu_items
+    ADD CONSTRAINT menu_items_produce_id_fkey FOREIGN KEY (produce_id) REFERENCES public.produce(produce_id);
+
+
+--
+-- Name: order_quantity order_quantity_menu_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.order_quantity
+    ADD CONSTRAINT order_quantity_menu_id_fkey FOREIGN KEY (menu_id) REFERENCES public.menu_items(menu_id);
+
+
+--
+-- Name: order_quantity order_quantity_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.order_quantity
+    ADD CONSTRAINT order_quantity_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.c_order(order_id);
+
+
+--
+-- Name: produce_nutrition produce_nutrition_nutrition_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.produce_nutrition
+    ADD CONSTRAINT produce_nutrition_nutrition_id_fkey FOREIGN KEY (nutrition_id) REFERENCES public.nutrition(nutrition_id);
+
+
+--
+-- Name: produce_nutrition produce_nutrition_produce_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.produce_nutrition
+    ADD CONSTRAINT produce_nutrition_produce_id_fkey FOREIGN KEY (produce_id) REFERENCES public.produce(produce_id);
+
+
+--
+-- Name: produce_quantity produce_quantity_menu_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.produce_quantity
+    ADD CONSTRAINT produce_quantity_menu_id_fkey FOREIGN KEY (menu_id) REFERENCES public.menu_items(menu_id);
+
+
+--
+-- Name: produce_quantity produce_quantity_produce_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.produce_quantity
+    ADD CONSTRAINT produce_quantity_produce_id_fkey FOREIGN KEY (produce_id) REFERENCES public.produce(produce_id);
+
+
+--
+-- Name: supply_order supply_order_produce_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.supply_order
+    ADD CONSTRAINT supply_order_produce_id_fkey FOREIGN KEY (produce_id) REFERENCES public.produce(produce_id);
+
+
+--
+-- Name: supply_order supply_order_store_num_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.supply_order
+    ADD CONSTRAINT supply_order_store_num_fkey FOREIGN KEY (store_num) REFERENCES public.store(store_num);
+
+
+--
+-- Name: supply_order supply_order_supplier_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zak
+--
+
+ALTER TABLE ONLY public.supply_order
+    ADD CONSTRAINT supply_order_supplier_id_fkey FOREIGN KEY (supplier_id) REFERENCES public.supplier(supplier_id);
+
+
+--
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: zak
+--
+
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+--
+-- PostgreSQL database cluster dump complete
+--
+
